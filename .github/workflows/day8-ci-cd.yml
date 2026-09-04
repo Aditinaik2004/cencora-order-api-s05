@@ -91,16 +91,20 @@ jobs:
       - name: Debug - Check Azure credentials
         run: |
           echo "App Name: ${{ vars.APP_NAME_DEV }}"
-          if [ -z "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}" ]; then
+          PUBLISH_PROFILE="${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}"
+          
+          if [ -z "$PUBLISH_PROFILE" ]; then
             echo "ERROR: AZURE_WEBAPP_PUBLISH_PROFILE_DEV secret is empty or not set"
             exit 1
           fi
-          PROFILE_LENGTH=${#{{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}}
-          echo "Publish Profile Length: $PROFILE_LENGTH"
-          if echo "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}" | grep -q "publishProfile"; then
+          
+          echo "Publish Profile Length: ${#PUBLISH_PROFILE} bytes"
+          
+          if echo "$PUBLISH_PROFILE" | grep -q "publishProfile"; then
             echo "✓ Publish profile contains expected XML"
           else
             echo "✗ Publish profile is missing XML content or is malformed"
+            echo "First 100 chars: $(echo "$PUBLISH_PROFILE" | head -c 100)"
             exit 1
           fi
           
@@ -121,16 +125,20 @@ jobs:
       - name: Debug - Check Azure credentials
         run: |
           echo "App Name: ${{ vars.APP_NAME_QA }}"
-          if [ -z "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}" ]; then
+          PUBLISH_PROFILE="${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}"
+          
+          if [ -z "$PUBLISH_PROFILE" ]; then
             echo "ERROR: AZURE_WEBAPP_PUBLISH_PROFILE_QA secret is empty or not set"
             exit 1
           fi
-          PROFILE_LENGTH=${#{{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}}
-          echo "Publish Profile Length: $PROFILE_LENGTH"
-          if echo "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}" | grep -q "publishProfile"; then
+          
+          echo "Publish Profile Length: ${#PUBLISH_PROFILE} bytes"
+          
+          if echo "$PUBLISH_PROFILE" | grep -q "publishProfile"; then
             echo "✓ Publish profile contains expected XML"
           else
             echo "✗ Publish profile is missing XML content or is malformed"
+            echo "First 100 chars: $(echo "$PUBLISH_PROFILE" | head -c 100)"
             exit 1
           fi
           
