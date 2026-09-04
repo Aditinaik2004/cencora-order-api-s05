@@ -73,15 +73,14 @@ jobs:
           echo "image_name_lower=${IMAGE_NAME_LOWER}" >> "$GITHUB_OUTPUT"
  
       - name: Build Docker image 
-        run: | 
-          docker build -t ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }} . 
-          docker tag ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }} \ 
-                     ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:latest 
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }} .
+          docker tag ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }} ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:latest
  
       - name: Push Docker image 
-        run: | 
-          docker push ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }} 
-          docker push ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:latest 
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }}
+          docker push ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:latest
  
   deploy_dev: 
     name: Deploy to DEV 
