@@ -51,7 +51,8 @@ jobs:
     if: github.event_name != 'pull_request' 
     runs-on: ubuntu-latest 
     outputs: 
-      image_tag: ${{ steps.meta.outputs.image_tag }} 
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+      image_name_lower: ${{ steps.meta.outputs.image_name_lower }}
     steps: 
       - name: Checkout source 
         uses: actions/checkout@v4 
@@ -66,19 +67,21 @@ jobs:
       - name: Create image tag 
         id: meta 
         run: | 
-          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7) 
-          echo "image_tag=sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT" 
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          echo "image_tag=sha-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "image_name_lower=${IMAGE_NAME_LOWER}" >> "$GITHUB_OUTPUT"
  
       - name: Build Docker image 
         run: | 
-          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.image_tag }} . 
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.image_tag }} \ 
-                     ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest 
+          docker build -t ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }} . 
+          docker tag ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }} \ 
+                     ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:latest 
  
       - name: Push Docker image 
         run: | 
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.image_tag }} 
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest 
+          docker push ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:${{ steps.meta.outputs.image_tag }} 
+          docker push ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name_lower }}:latest 
  
   deploy_dev: 
     name: Deploy to DEV 
@@ -91,7 +94,7 @@ jobs:
         with: 
           app-name: ${{ vars.APP_NAME_DEV }} 
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }} 
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.docker_build_push.outputs.image_tag }} 
+          images: ${{ env.REGISTRY }}/${{ needs.docker_build_push.outputs.image_name_lower }}:${{ needs.docker_build_push.outputs.image_tag }} 
  
   deploy_qa: 
     name: Deploy to QA 
@@ -105,4 +108,4 @@ jobs:
         with: 
           app-name: ${{ vars.APP_NAME_QA }} 
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }} 
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.docker_build_push.outputs.image_tag }}
+          images: ${{ env.REGISTRY }}/${{ needs.docker_build_push.outputs.image_name_lower }}:${{ needs.docker_build_push.outputs.image_tag }}
