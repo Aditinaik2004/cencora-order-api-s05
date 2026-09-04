@@ -26,3 +26,8 @@ for the Cencora order management system.
 ```bash
 pip install -r requirements.txt
 python app/main.py
+
+
+
+## Lab 7 — CI/CD Validation
+Pipeline triggered: 4 September 2026
