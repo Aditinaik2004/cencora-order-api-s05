@@ -88,26 +88,6 @@ jobs:
     runs-on: ubuntu-latest 
     environment: development 
     steps:
-      - name: Debug - Check Azure credentials
-        run: |
-          echo "App Name: ${{ vars.APP_NAME_DEV }}"
-          PUBLISH_PROFILE="${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}"
-          
-          if [ -z "$PUBLISH_PROFILE" ]; then
-            echo "ERROR: AZURE_WEBAPP_PUBLISH_PROFILE_DEV secret is empty or not set"
-            exit 1
-          fi
-          
-          echo "Publish Profile Length: ${#PUBLISH_PROFILE} bytes"
-          
-          if echo "$PUBLISH_PROFILE" | grep -q "publishProfile"; then
-            echo "✓ Publish profile contains expected XML"
-          else
-            echo "✗ Publish profile is missing XML content or is malformed"
-            echo "First 100 chars: $(echo "$PUBLISH_PROFILE" | head -c 100)"
-            exit 1
-          fi
-          
       - name: Deploy container to Azure Web App - DEV 
         uses: azure/webapps-deploy@v3 
         with: 
@@ -122,26 +102,6 @@ jobs:
     runs-on: ubuntu-latest 
     environment: qa 
     steps:
-      - name: Debug - Check Azure credentials
-        run: |
-          echo "App Name: ${{ vars.APP_NAME_QA }}"
-          PUBLISH_PROFILE="${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}"
-          
-          if [ -z "$PUBLISH_PROFILE" ]; then
-            echo "ERROR: AZURE_WEBAPP_PUBLISH_PROFILE_QA secret is empty or not set"
-            exit 1
-          fi
-          
-          echo "Publish Profile Length: ${#PUBLISH_PROFILE} bytes"
-          
-          if echo "$PUBLISH_PROFILE" | grep -q "publishProfile"; then
-            echo "✓ Publish profile contains expected XML"
-          else
-            echo "✗ Publish profile is missing XML content or is malformed"
-            echo "First 100 chars: $(echo "$PUBLISH_PROFILE" | head -c 100)"
-            exit 1
-          fi
-          
       - name: Deploy same image to Azure Web App - QA 
         uses: azure/webapps-deploy@v3 
         with: 
