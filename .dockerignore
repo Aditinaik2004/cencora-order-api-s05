@@ -1,1 +1,35 @@
+# Git files - not needed inside Docker image
+.git
+.gitignore
+
+# GitHub Actions - not needed inside container
+.github/
+
+# Python cache files - not needed
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments - container installs its own
+venv/
+.venv/
+env/
+
+# Local environment files
+.env
+*.env
+
+# Documentation - not needed in production image
+README.md
+*.md
+
+# Test files - not needed in production image
+tests/
+test_*.py
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
 
