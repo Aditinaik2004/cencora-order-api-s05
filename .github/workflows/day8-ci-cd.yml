@@ -87,7 +87,23 @@ jobs:
     needs: docker_build_push 
     runs-on: ubuntu-latest 
     environment: development 
-    steps: 
+    steps:
+      - name: Debug - Check Azure credentials
+        run: |
+          echo "App Name: ${{ vars.APP_NAME_DEV }}"
+          if [ -z "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}" ]; then
+            echo "ERROR: AZURE_WEBAPP_PUBLISH_PROFILE_DEV secret is empty or not set"
+            exit 1
+          fi
+          PROFILE_LENGTH=${#{{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}}
+          echo "Publish Profile Length: $PROFILE_LENGTH"
+          if echo "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}" | grep -q "publishProfile"; then
+            echo "✓ Publish profile contains expected XML"
+          else
+            echo "✗ Publish profile is missing XML content or is malformed"
+            exit 1
+          fi
+          
       - name: Deploy container to Azure Web App - DEV 
         uses: azure/webapps-deploy@v3 
         with: 
@@ -101,7 +117,23 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.deploy_to_qa == 'true' 
     runs-on: ubuntu-latest 
     environment: qa 
-    steps: 
+    steps:
+      - name: Debug - Check Azure credentials
+        run: |
+          echo "App Name: ${{ vars.APP_NAME_QA }}"
+          if [ -z "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}" ]; then
+            echo "ERROR: AZURE_WEBAPP_PUBLISH_PROFILE_QA secret is empty or not set"
+            exit 1
+          fi
+          PROFILE_LENGTH=${#{{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}}
+          echo "Publish Profile Length: $PROFILE_LENGTH"
+          if echo "${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}" | grep -q "publishProfile"; then
+            echo "✓ Publish profile contains expected XML"
+          else
+            echo "✗ Publish profile is missing XML content or is malformed"
+            exit 1
+          fi
+          
       - name: Deploy same image to Azure Web App - QA 
         uses: azure/webapps-deploy@v3 
         with: 
